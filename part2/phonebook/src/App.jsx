@@ -3,13 +3,17 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import axios from "axios";
+import personService from "./services/personService";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    personService.getAllPersons().then((response) => {
+      setPersons(response);
     });
+    // axios.get("http://localhost:3001/persons").then((response) => {
+    //   setPersons(response.data);
+    // });
   }, []);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
@@ -20,15 +24,24 @@ const App = () => {
     if (persons.map((person) => person.name).includes(newName)) {
       alert(`${newName} is already in the list`);
     } else {
-      axios
-        .post("http://localhost:3001/persons", {
+      personService
+        .addNewPerson({
           name: newName,
           number: newNumber,
           id: persons.length + 1,
         })
         .then((response) => {
-          setPersons([...persons, response.data]);
+          setPersons([...persons, response]);
         });
+      // axios
+      //   .post("http://localhost:3001/persons", {
+      //     name: newName,
+      //     number: newNumber,
+      //     id: persons.length + 1,
+      //   })
+      //   .then((response) => {
+      //     setPersons([...persons, response.data]);
+      //   });
       // setPersons([
       //   ...persons,
       //   { name: newName, number: newNumber, id: persons.length + 1 },

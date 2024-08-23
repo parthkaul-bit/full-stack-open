@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
-import axios from "axios";
 import personService from "./services/personService";
 
 const App = () => {
@@ -11,9 +10,6 @@ const App = () => {
     personService.getAllPersons().then((response) => {
       setPersons(response);
     });
-    // axios.get("http://localhost:3001/persons").then((response) => {
-    //   setPersons(response.data);
-    // });
   }, []);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
@@ -28,24 +24,11 @@ const App = () => {
         .addNewPerson({
           name: newName,
           number: newNumber,
-          id: persons.length + 1,
+          id: (persons.length + 1).toString(),
         })
         .then((response) => {
           setPersons([...persons, response]);
         });
-      // axios
-      //   .post("http://localhost:3001/persons", {
-      //     name: newName,
-      //     number: newNumber,
-      //     id: persons.length + 1,
-      //   })
-      //   .then((response) => {
-      //     setPersons([...persons, response.data]);
-      //   });
-      // setPersons([
-      //   ...persons,
-      //   { name: newName, number: newNumber, id: persons.length + 1 },
-      // ]);
     }
 
     setNewName("");
@@ -56,6 +39,15 @@ const App = () => {
   };
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value);
+  };
+
+  const handleDelete = (id) => {
+    const targetPerson = persons.find((person) => person.id === id);
+    if (window.confirm(`Delete ${targetPerson.name}`)) {
+      personService.deletePerson(id).then((response) => {
+        setPersons(persons.filter((person) => response.id !== person.id));
+      });
+    }
   };
 
   const filteredPersons = persons.filter((person) =>
@@ -82,7 +74,7 @@ const App = () => {
         handleSubmit={handleSubmit}
       />
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons filteredPersons={filteredPersons} handleDelete={handleDelete} />
     </div>
   );
 };

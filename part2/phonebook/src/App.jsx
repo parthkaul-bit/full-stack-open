@@ -20,10 +20,19 @@ const App = () => {
     if (persons.map((person) => person.name).includes(newName)) {
       alert(`${newName} is already in the list`);
     } else {
-      setPersons([
-        ...persons,
-        { name: newName, number: newNumber, id: persons.length + 1 },
-      ]);
+      axios
+        .post("http://localhost:3001/persons", {
+          name: newName,
+          number: newNumber,
+          id: persons.length + 1,
+        })
+        .then((response) => {
+          setPersons([...persons, response.data]);
+        });
+      // setPersons([
+      //   ...persons,
+      //   { name: newName, number: newNumber, id: persons.length + 1 },
+      // ]);
     }
 
     setNewName("");

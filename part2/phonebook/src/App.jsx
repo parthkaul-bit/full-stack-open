@@ -6,19 +6,34 @@ import personService from "./services/personService";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     personService.getAllPersons().then((response) => {
       setPersons(response);
     });
   }, []);
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const person = persons.find((p) => p.name === newName);
     if (persons.map((person) => person.name).includes(newName)) {
-      alert(`${newName} is already in the list`);
+      if (
+        window.confirm(
+          `${newName} is already added to the phonebook, replace the old number with a new one? `
+        )
+      ) {
+        personService
+          .updatedPerson({
+            ...person,
+            number: newNumber,
+          })
+          .then((response) => {
+            setPersons(persons.map((p) => (p.id !== person.id ? p : response)));
+          });
+      }
     } else {
       personService
         .addNewPerson({

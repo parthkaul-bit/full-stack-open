@@ -3,13 +3,15 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import personService from "./services/personService";
+import "./index.css";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   useEffect(() => {
     personService.getAllPersons().then((response) => {
       setPersons(response);
@@ -32,6 +34,17 @@ const App = () => {
           })
           .then((response) => {
             setPersons(persons.map((p) => (p.id !== person.id ? p : response)));
+          })
+          .catch((err) => {
+            if (err.response.status === 404) {
+              setErrorMessage(
+                `Information of ${newName} has already been removed from the server.`
+              );
+
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 3000);
+            }
           });
       }
     } else {
@@ -43,6 +56,11 @@ const App = () => {
         })
         .then((response) => {
           setPersons([...persons, response]);
+          setSuccessMessage(`${newName} added to the list`);
+
+          setTimeout(() => {
+            setSuccessMessage(null);
+          }, 3000);
         });
     }
 
@@ -59,9 +77,22 @@ const App = () => {
   const handleDelete = (id) => {
     const targetPerson = persons.find((person) => person.id === id);
     if (window.confirm(`Delete ${targetPerson.name}`)) {
-      personService.deletePerson(id).then((response) => {
-        setPersons(persons.filter((person) => response.id !== person.id));
-      });
+      personService
+        .deletePerson(id)
+        .then((response) => {
+          setPersons(persons.filter((person) => response.id !== person.id));
+        })
+        .catch((err) => {
+          if (err.response.status === 404) {
+            setErrorMessage(
+              `Information of ${newName} has already been removed from the server.`
+            );
+
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 3000);
+          }
+        });
     }
   };
 
@@ -75,6 +106,18 @@ const App = () => {
 
   return (
     <div>
+      <div
+        className="error"
+        style={{ display: errorMessage ? "block" : "none" }}
+      >
+        {errorMessage}
+      </div>
+      <div
+        className="success"
+        style={{ display: successMessage ? "block" : "none" }}
+      >
+        {successMessage}
+      </div>
       <h2>Phonebook</h2>
       <Filter
         searchQuery={searchQuery}

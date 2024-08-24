@@ -1,10 +1,6 @@
 import React from "react";
 
-<<<<<<< HEAD
 const CountryDetail = ({ country }) => {
-=======
-const CountryDetail = () => {
->>>>>>> c5abd28290defdf87ed288f37d200f024ffe5218
   return (
     <div key={country.name.common}>
       <h3>{country.name.common}</h3>
@@ -24,11 +20,7 @@ const CountryDetail = () => {
       ) : (
         <p>No languages available</p>
       )}
-<<<<<<< HEAD
       <img src={country.flags.png} alt="country flag" />
-=======
-      <img src={country.flags.png} style={{ padding: 0 }} alt="" />
->>>>>>> c5abd28290defdf87ed288f37d200f024ffe5218
     </div>
   );
 };

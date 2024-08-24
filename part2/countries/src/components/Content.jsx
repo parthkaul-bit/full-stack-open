@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import React from "react";
 import CountryDetail from "./CountryDetail";
+=======
+import React, { useState } from "react";
+>>>>>>> c5abd28290defdf87ed288f37d200f024ffe5218
 
 const Content = ({ searchedCountries, searchQuery }) => {
   let content;
@@ -7,7 +11,11 @@ const Content = ({ searchedCountries, searchQuery }) => {
     content = <p>Too many matches, specify other filters.</p>;
   } else if (searchedCountries.length === 1) {
     content = searchedCountries.map((country) => {
+<<<<<<< HEAD
       return <CountryDetail country={country} />;
+=======
+      return <CountryDetails country={country} />;
+>>>>>>> c5abd28290defdf87ed288f37d200f024ffe5218
     });
   } else {
     content = searchedCountries.map((country) => (

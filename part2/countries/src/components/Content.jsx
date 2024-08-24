@@ -1,27 +1,44 @@
-<<<<<<< HEAD
-import React from "react";
-import CountryDetail from "./CountryDetail";
-=======
 import React, { useState } from "react";
->>>>>>> c5abd28290defdf87ed288f37d200f024ffe5218
+import CountryDetail from "./CountryDetail";
 
 const Content = ({ searchedCountries, searchQuery }) => {
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
+  const handleClick = (country) => {
+    setSelectedCountry(country);
+  };
+
+  const handleReset = () => {
+    setSelectedCountry(null);
+  };
+
   let content;
+
   if (searchedCountries.length === 0 && searchQuery !== "") {
     content = <p>Too many matches, specify other filters.</p>;
   } else if (searchedCountries.length === 1) {
-    content = searchedCountries.map((country) => {
-<<<<<<< HEAD
-      return <CountryDetail country={country} />;
-=======
-      return <CountryDetails country={country} />;
->>>>>>> c5abd28290defdf87ed288f37d200f024ffe5218
-    });
+    content = (
+      <>
+        <CountryDetail country={searchedCountries[0]} />
+        <button onClick={handleReset}>Back</button>
+      </>
+    );
+  } else if (selectedCountry) {
+    content = (
+      <>
+        <CountryDetail country={selectedCountry} />
+        <button onClick={handleReset}>Back</button>
+      </>
+    );
   } else {
     content = searchedCountries.map((country) => (
-      <p key={country.name.common}>{country.name.common}</p>
+      <div key={country.name.common}>
+        <p>{country.name.common}</p>
+        <button onClick={() => handleClick(country)}>Show</button>
+      </div>
     ));
   }
+
   return <>{content}</>;
 };
 

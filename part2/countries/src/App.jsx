@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Content from "./components/Content";
-
 function App() {
   const [countries, setCountries] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,13 +42,6 @@ function App() {
         searchQuery={searchQuery}
         searchedCountries={searchedCountries}
       />
-      {/* {searchedCountries.length === 0 && searchQuery !== "" ? (
-        <p> Too many matches, specify other filters. </p>
-      ) : (
-        searchedCountries.map((country) => {
-          return <p key={country.name.common}>{country.name.common}</p>;
-        })
-      )} */}
     </>
   );
 }

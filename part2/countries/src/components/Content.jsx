@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import CountryDetail from "./CountryDetail";
 
 const Content = ({ searchedCountries, searchQuery }) => {
   let content;
@@ -6,7 +7,7 @@ const Content = ({ searchedCountries, searchQuery }) => {
     content = <p>Too many matches, specify other filters.</p>;
   } else if (searchedCountries.length === 1) {
     content = searchedCountries.map((country) => {
-      return <CountryDetails country={country} />;
+      return <CountryDetail country={country} />;
     });
   } else {
     content = searchedCountries.map((country) => (

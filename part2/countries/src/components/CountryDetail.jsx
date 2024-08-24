@@ -1,6 +1,6 @@
 import React from "react";
 
-const CountryDetail = () => {
+const CountryDetail = ({ country }) => {
   return (
     <div key={country.name.common}>
       <h3>{country.name.common}</h3>
@@ -20,7 +20,7 @@ const CountryDetail = () => {
       ) : (
         <p>No languages available</p>
       )}
-      <img src={country.flags.png} style={{ padding: 0 }} alt="" />
+      <img src={country.flags.png} alt="country flag" />
     </div>
   );
 };

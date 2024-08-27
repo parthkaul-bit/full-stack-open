@@ -51,14 +51,29 @@ app.get("/info", (request, response) => {
 });
 
 app.post("/api/persons/", (request, response) => {
+  const name = request.body.name;
+  const number = request.body.number;
+  if (!name || !number) {
+    return response.status(400).json({
+      error: !request.body.name ? "name is missing" : "number is missing",
+    });
+  }
+
+  const matchingName = persons.find((person) => person.name === name);
+  if (matchingName) {
+    return response.status(400).json({
+      error: "Name must be unique",
+    });
+  }
+
   const person = {
-    name: request.body.name,
-    number: request.body.number,
+    name,
+    number,
     id: Math.floor(Math.random() * 10000).toString(),
   };
 
   persons = persons.concat(person);
-  response.json(persons);
+  return response.status(201).json(persons);
 });
 
 app.delete("/api/persons/:id", (request, response) => {

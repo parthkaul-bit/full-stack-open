@@ -40,13 +40,6 @@ app.get("/api/persons/:id", (request, response) => {
   }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  persons = persons.filter((person) => person.id !== id);
-
-  response.json(persons);
-});
-
 app.get("/info", (request, response) => {
   let people = persons.length;
   const time = new Date();
@@ -55,6 +48,24 @@ app.get("/info", (request, response) => {
       <p>Phonebook has info for ${people} people</p>
       <p>${time.toLocaleString("en-GB")} ${timeZone}</p>
     `);
+});
+
+app.post("/api/persons/", (request, response) => {
+  const person = {
+    name: request.body.name,
+    number: request.body.number,
+    id: Math.floor(Math.random() * 10000).toString(),
+  };
+
+  persons = persons.concat(person);
+  response.json(persons);
+});
+
+app.delete("/api/persons/:id", (request, response) => {
+  const id = request.params.id;
+  persons = persons.filter((person) => person.id !== id);
+
+  response.json(persons);
 });
 
 const PORT = 3001;

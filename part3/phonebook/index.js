@@ -29,6 +29,16 @@ app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
 
+app.get("/info", (request, response) => {
+  let people = persons.length;
+  const time = new Date();
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  response.send(`
+      <p>Phonebook has info for ${people} people</p>
+      <p>${time.toLocaleString("en-GB")} ${timeZone}</p>
+    `);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

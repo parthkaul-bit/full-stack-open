@@ -1,10 +1,13 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const cors = require("cors");
+require("dotenv").config();
 
+app.use(cors());
 app.use(express.json());
 
-app.use(morgan(":method :url :body"));
+// app.use(morgan(":method :url :body"));
 
 let persons = [
   {
@@ -77,7 +80,7 @@ app.post("/api/persons/", (request, response) => {
   };
 
   persons = persons.concat(person);
-  morgan.token("body", (request) => JSON.stringify(request.body));
+  // morgan.token("body", (request) => JSON.stringify(request.body));
   return response.status(201).json(persons);
 });
 

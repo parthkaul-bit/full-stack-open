@@ -12,19 +12,21 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     personService.getAllPersons().then((response) => {
       setPersons(response);
     });
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const person = persons.find((p) => p.name === newName);
-    if (persons.map((person) => person.name).includes(newName)) {
+
+    if (person) {
       if (
         window.confirm(
-          `${newName} is already added to the phonebook, replace the old number with a new one? `
+          `${newName} is already added to the phonebook, replace the old number with a new one?`
         )
       ) {
         personService
@@ -34,16 +36,16 @@ const App = () => {
           })
           .then((response) => {
             setPersons(persons.map((p) => (p.id !== person.id ? p : response)));
+            setSuccessMessage(`${newName}'s number updated successfully.`);
           })
           .catch((err) => {
             if (err.response.status === 404) {
               setErrorMessage(
                 `Information of ${newName} has already been removed from the server.`
               );
-
-              setTimeout(() => {
-                setErrorMessage(null);
-              }, 3000);
+              setPersons(persons.filter((p) => p.id !== person.id));
+            } else {
+              setErrorMessage(`Failed to update ${newName}.`);
             }
           });
       }
@@ -52,24 +54,32 @@ const App = () => {
         .addNewPerson({
           name: newName,
           number: newNumber,
-          id: (persons.length + 1).toString(),
         })
         .then((response) => {
           setPersons([...persons, response]);
-          setSuccessMessage(`${newName} added to the list`);
-
-          setTimeout(() => {
-            setSuccessMessage(null);
-          }, 3000);
+          setSuccessMessage(`${newName} added to the list.`);
+          personService.getAllPersons().then((response) => {
+            setPersons(response);
+          });
+        })
+        .catch(() => {
+          setErrorMessage(`Failed to add ${newName}.`);
         });
     }
+
+    setTimeout(() => {
+      setSuccessMessage(null);
+      setErrorMessage(null);
+    }, 3000);
 
     setNewName("");
     setNewNumber("");
   };
+
   const handleNameChange = (event) => {
     setNewName(event.target.value);
   };
+
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value);
   };
@@ -79,25 +89,30 @@ const App = () => {
     if (window.confirm(`Delete ${targetPerson.name}`)) {
       personService
         .deletePerson(id)
-        .then((response) => {
-          setPersons(persons.filter((person) => response.id !== person.id));
+        .then(() => {
+          setPersons(persons.filter((person) => person.id !== id));
+          setSuccessMessage(`${targetPerson.name} deleted successfully.`);
         })
         .catch((err) => {
           if (err.response.status === 404) {
             setErrorMessage(
-              `Information of ${newName} has already been removed from the server.`
+              `Information of ${targetPerson.name} has already been removed from the server.`
             );
-
-            setTimeout(() => {
-              setErrorMessage(null);
-            }, 3000);
+            setPersons(persons.filter((p) => p.id !== id));
+          } else {
+            setErrorMessage(`Failed to delete ${targetPerson.name}.`);
           }
         });
+
+      setTimeout(() => {
+        setErrorMessage(null);
+        setSuccessMessage(null);
+      }, 3000);
     }
   };
 
   const filteredPersons = persons.filter((person) =>
-    person.name.toLowerCase().includes(searchQuery)
+    person.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSearchChange = (event) => {

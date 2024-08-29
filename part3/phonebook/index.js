@@ -40,25 +40,34 @@ app.get("/api/persons", (request, response) => {
   });
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
-  const person = persons.find((person) => person.id === id);
 
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).send("Not Found");
-  }
+  Person.findById(id)
+    .then((person) => {
+      response.json(person);
+      // console.log(person);
+    })
+    .catch((error) => next(error));
+
+  // const person = persons.find((person) => person.id === id);
+
+  // if (person) {
+  //   response.json(person);
+  // } else {
+  //   response.status(404).send("Not Found");
+  // }
 });
 
-app.get("/info", (request, response) => {
-  let people = persons.length;
-  const time = new Date();
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  response.send(`
-      <p>Phonebook has info for ${people} people</p>
-      <p>${time.toLocaleString("en-GB")} ${timeZone}</p>
-    `);
+app.get("/info", (request, response, next) => {
+  Person.countDocuments({}).then((count) => {
+    const time = new Date();
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    response.send(`
+          <p>Phonebook has info for ${count} people</p>
+          <p>${time.toLocaleString("en-GB")} ${timeZone}</p>
+        `);
+  });
 });
 
 app.post("/api/persons/", (request, response) => {

@@ -47,7 +47,6 @@ if (!number && !name) {
         return `${person.name}  ${person.number}`;
       })
     );
-    mongoose.connection.close();
   });
 } else {
   const person = new Person({
@@ -57,7 +56,6 @@ if (!number && !name) {
 
   person.save().then(() => {
     console.log(`added ${name} number ${number} to phonebook`);
-    mongoose.connection.close();
   });
 }
 

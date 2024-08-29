@@ -35,7 +35,9 @@ let persons = [
 ];
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then((people) => {
+    response.json(people);
+  });
 });
 
 app.get("/api/persons/:id", (request, response) => {
@@ -75,15 +77,17 @@ app.post("/api/persons/", (request, response) => {
     });
   }
 
-  const person = {
+  const person = new Person({
     name,
     number,
-    id: Math.floor(Math.random() * 10000).toString(),
-  };
+  });
 
-  persons = persons.concat(person);
+  person.save().then((savedPerson) => {
+    response.status(201).json(savedPerson);
+  });
+  // persons = persons.concat(person);
   // morgan.token("body", (request) => JSON.stringify(request.body));
-  return response.status(201).json(persons);
+  // return response.status(201).json(persons);
 });
 
 app.delete("/api/persons/:id", (request, response) => {

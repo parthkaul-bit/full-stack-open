@@ -92,9 +92,15 @@ app.post("/api/persons/", (request, response) => {
 
 app.delete("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  persons = persons.filter((person) => person.id !== id);
 
-  response.json(persons);
+  Person.findByIdAndDelete(id)
+    .then(() => {
+      response.status(204).end();
+    })
+    .catch((error) => next(error));
+
+  // persons = persons.filter((person) => person.id !== id);
+  // response.json(persons);
 });
 
 const PORT = 3001;

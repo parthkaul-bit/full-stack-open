@@ -90,7 +90,7 @@ app.post("/api/persons/", (request, response) => {
   // return response.status(201).json(persons);
 });
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
 
   Person.findByIdAndDelete(id)
@@ -101,6 +101,19 @@ app.delete("/api/persons/:id", (request, response) => {
 
   // persons = persons.filter((person) => person.id !== id);
   // response.json(persons);
+});
+
+app.put("/api/persons/:id", (request, response, next) => {
+  const person = {
+    name: request.body.name,
+    number: request.body.number,
+  };
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then((updatedPerson) => {
+      response.json(updatedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 const PORT = 3001;

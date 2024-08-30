@@ -91,9 +91,16 @@ app.post("/api/persons/", (request, response) => {
     number,
   });
 
-  person.save().then((savedPerson) => {
-    response.status(201).json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      response.status(201).json(savedPerson);
+    })
+    .catch((error) => {
+      if (error.name === "ValidationError") {
+        response.status(400).json({ error: error.message });
+      }
+    });
   // persons = persons.concat(person);
   // morgan.token("body", (request) => JSON.stringify(request.body));
   // return response.status(201).json(persons);

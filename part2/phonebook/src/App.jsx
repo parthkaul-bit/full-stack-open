@@ -62,8 +62,8 @@ const App = () => {
             setPersons(response);
           });
         })
-        .catch(() => {
-          setErrorMessage(`Failed to add ${newName}.`);
+        .catch((error) => {
+          setErrorMessage(error.response.data.error);
         });
     }
 

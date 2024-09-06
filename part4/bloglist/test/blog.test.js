@@ -227,6 +227,21 @@ test("POST request to the successfully creates a new blog post in db", async () 
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1);
 });
 
+test("if likes are not provided, its defaulted to 0", async () => {
+  const newBlog = {
+    title: "newTitle",
+    author: "newAuthor",
+    url: "newURL",
+  };
+
+  const response = await api.post("/api/blogs").send(newBlog).expect(201);
+
+  assert.strictEqual(response.body.likes, 0);
+  assert.strictEqual(response.body.title, newBlog.title);
+  assert.strictEqual(response.body.author, newBlog.author);
+  assert.strictEqual(response.body.url, newBlog.url);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });

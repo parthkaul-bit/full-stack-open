@@ -1,6 +1,27 @@
-const { test, describe } = require("node:test");
+const { test, describe, beforeEach, after } = require("node:test");
 const assert = require("node:assert");
 const listHelper = require("../utils/list_helper");
+const supertest = require("supertest");
+const app = require("../app");
+const { response } = require("express");
+const Blog = require("../models/blog");
+const api = supertest(app);
+const helper = require("./test_helper");
+const blog = require("../models/blog");
+const mongoose = require("mongoose");
+
+beforeEach(async () => {
+  await Blog.deleteMany({});
+
+  let blogObject = new Blog(helper.initialBlogs[0]);
+  await blogObject.save();
+
+  blogObject = new Blog(helper.initialBlogs[1]);
+  await blogObject.save();
+
+  blogObject = new Blog(helper.initialBlogs[2]);
+  await blogObject.save();
+});
 
 test("dummy returns one", () => {
   const blogs = [];
@@ -173,4 +194,39 @@ describe("favourite blogs", () => {
       likes: 12,
     });
   });
+});
+
+test("API return correct amount of blog posts in the JSON format", async () => {
+  const response = await api
+    .get("/api/blogs")
+    .expect("Content-type", /application\/json/);
+
+  assert.strictEqual(response.body.length, helper.initialBlogs.length);
+});
+
+test("blog posts has property named id instead of _id", async () => {
+  const response = await api.get("/api/blogs");
+
+  response.body.forEach((blog) => {
+    assert(blog.id);
+    assert(!blog._id);
+  });
+});
+
+test("POST request to the successfully creates a new blog post in db", async () => {
+  const newBlog = {
+    title: "newTitle",
+    author: "newAuthor",
+    url: "newURL",
+    likes: 10,
+  };
+  await api.post("/api/blogs").send(newBlog).expect(201);
+
+  const blogsAtEnd = await helper.blogsInDb();
+
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1);
+});
+
+after(async () => {
+  await mongoose.connection.close();
 });

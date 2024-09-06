@@ -18,16 +18,11 @@ blogsRouter.post("/", (request, response) => {
   });
 });
 
-blogsRouter.delete("/:id", async (request, response) => {
-  const matchingId = request.params.id;
-  const matchingBlog = await Blog.findById(matchingId);
-
-  if (!matchingBlog) {
-    return response.json({ error: "Blog doesn't exist" });
-  } else {
-    const deletedBlog = await Blog.findByIdAndDelete(matchingId);
-    response.status(204).json(deletedBlog);
-  }
+blogsRouter.delete("/:id", (request, response) => {
+  const matchingId = request.body.params.id;
+  Blog.findByIdAndDelete(matchingId).then((blogs) => {
+    response.json(blogs);
+  });
 });
 
 module.exports = blogsRouter;

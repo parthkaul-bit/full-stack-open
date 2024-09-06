@@ -249,6 +249,20 @@ test("backend responds with bad request when title or url properties are missing
   };
   await api.post("/api/blogs").send(newBlog).expect(400);
 });
+
+test("deleting a blog", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToDelete = blogsAtStart[0];
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
+
+  const deletedBlog = await Blog.findById(blogToDelete.id);
+  assert.strictEqual(deletedBlog, null);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });

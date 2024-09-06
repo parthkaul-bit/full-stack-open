@@ -242,6 +242,13 @@ test("if likes are not provided, its defaulted to 0", async () => {
   assert.strictEqual(response.body.url, newBlog.url);
 });
 
+test("backend responds with bad request when title or url properties are missing", async () => {
+  const newBlog = {
+    author: "newAuthor",
+    likes: 10,
+  };
+  await api.post("/api/blogs").send(newBlog).expect(400);
+});
 after(async () => {
   await mongoose.connection.close();
 });

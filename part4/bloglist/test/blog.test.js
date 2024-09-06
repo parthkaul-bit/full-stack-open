@@ -263,6 +263,49 @@ test("deleting a blog", async () => {
   assert.strictEqual(deletedBlog, null);
 });
 
+test("PUT request returns 400 if fields are missing", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToUpdate = blogsAtStart[0];
+
+  const updatedBlog = {
+    title: "Updated Title",
+  };
+
+  await api.put(`/api/blogs/${blogToUpdate.id}`).send(updatedBlog).expect(400);
+});
+
+test("PUT request updates a blog post successfully", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToUpdate = blogsAtStart[0];
+
+  const updatedBlog = {
+    title: "Updated Title",
+    author: "Updated Author",
+    url: "http://updated.url",
+    likes: 20,
+  };
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  assert.strictEqual(response.body.title, updatedBlog.title);
+  assert.strictEqual(response.body.author, updatedBlog.author);
+  assert.strictEqual(response.body.url, updatedBlog.url);
+  assert.strictEqual(response.body.likes, updatedBlog.likes);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
+
+  const updatedBlogInDb = await Blog.findById(blogToUpdate.id);
+  assert.strictEqual(updatedBlogInDb.title, updatedBlog.title);
+  assert.strictEqual(updatedBlogInDb.author, updatedBlog.author);
+  assert.strictEqual(updatedBlogInDb.url, updatedBlog.url);
+  assert.strictEqual(updatedBlogInDb.likes, updatedBlog.likes);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });

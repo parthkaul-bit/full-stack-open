@@ -28,10 +28,7 @@ blogsRouter.post("/", async (request, response) => {
     return response.status(400).json({ error: "Title and URL are required" });
   }
 
-  const decodedToken = jwt.verify(
-    getTokenFrom(request),
-    process.env.JWT_SECRET
-  );
+  const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
   if (!decodedToken.id) {
     return response.status(401).json({ error: "token invalid" });
   }

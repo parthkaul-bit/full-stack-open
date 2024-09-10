@@ -49,13 +49,34 @@ blogsRouter.post("/", async (request, response) => {
 
 blogsRouter.delete("/:id", async (request, response) => {
   const matchingId = request.params.id;
-  const matchingBlog = await Blog.findById(matchingId);
 
-  if (!matchingBlog) {
-    return response.json({ error: "Blog doesn't exist" });
-  } else {
-    const deletedBlog = await Blog.findByIdAndDelete(matchingId);
-    response.status(204).json(deletedBlog);
+  try {
+    const decodedToken = jwt.verify(request.token, process.env.JWT_SECRET);
+    if (!decodedToken.id) {
+      return response
+        .status(401)
+        .json({ error: "Token is invalid or missing" });
+    }
+
+    const matchingBlog = await Blog.findById(matchingId);
+    if (!matchingBlog) {
+      return response.status(404).json({ error: "Blog doesn't exist" });
+    }
+
+    if (matchingBlog.user.toString() !== decodedToken.id.toString()) {
+      return response
+        .status(403)
+        .json({ error: "User is not authorized to delete this blog" });
+    }
+
+    await Blog.findByIdAndDelete(matchingId);
+    return response.status(204).end();
+  } catch (error) {
+    if (error.name === "JsonWebTokenError") {
+      return response.status(401).json({ error: "Invalid token" });
+    }
+    console.error(error);
+    return response.status(500).json({ error: "Internal server error" });
   }
 });
 

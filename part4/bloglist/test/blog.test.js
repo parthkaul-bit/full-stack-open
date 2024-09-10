@@ -10,6 +10,7 @@ const blog = require("../models/blog");
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const _ = require("lodash");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
@@ -360,9 +361,92 @@ test("PUT request updates a blog post successfully", async () => {
   assert.strictEqual(updatedBlogInDb.likes, updatedBlog.likes);
 });
 
+test("mostBlogs", async (t) => {
+  await t.test("when list has only one blog, equals the author of that", () => {
+    const listWithOneBlog = [
+      {
+        _id: "5a422aa71b54a676234d17f8",
+        title: "Go To Statement Considered Harmful",
+        author: "Edsger W. Dijkstra",
+        url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+        likes: 5,
+        __v: 0,
+      },
+    ];
+
+    const result = helper.mostBlogs(listWithOneBlog);
+    assert.deepStrictEqual(result, {
+      author: "Edsger W. Dijkstra",
+      blogs: 1,
+    });
+  });
+
+  await t.test("of empty list is null", () => {
+    assert.strictEqual(helper.mostBlogs([]), null);
+  });
+
+  await t.test(
+    "when list has multiple blogs, equals the author with most blogs",
+    () => {
+      const blogs = [
+        { author: "Robert C. Martin", title: "Blog 1" },
+        { author: "Robert C. Martin", title: "Blog 2" },
+        { author: "Robert C. Martin", title: "Blog 3" },
+        { author: "Edsger W. Dijkstra", title: "Blog 4" },
+        { author: "Edsger W. Dijkstra", title: "Blog 5" },
+      ];
+
+      const result = helper.mostBlogs(blogs);
+      assert.deepStrictEqual(result, {
+        author: "Robert C. Martin",
+        blogs: 3,
+      });
+    }
+  );
+});
+
+test("mostLikes", async (t) => {
+  await t.test("when list has only one blog, equals the likes of that", () => {
+    const listWithOneBlog = [
+      {
+        _id: "5a422aa71b54a676234d17f8",
+        title: "Go To Statement Considered Harmful",
+        author: "Edsger W. Dijkstra",
+        url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+        likes: 5,
+        __v: 0,
+      },
+    ];
+
+    const result = helper.mostLikes(listWithOneBlog);
+    assert.deepStrictEqual(result, {
+      author: "Edsger W. Dijkstra",
+      likes: 5,
+    });
+  });
+
+  await t.test("of empty list is null", () => {
+    assert.strictEqual(helper.mostLikes([]), null);
+  });
+
+  await t.test(
+    "when list has multiple blogs, equals the author with most likes",
+    () => {
+      const blogs = [
+        { author: "Robert C. Martin", likes: 10 },
+        { author: "Robert C. Martin", likes: 5 },
+        { author: "Edsger W. Dijkstra", likes: 12 },
+        { author: "Edsger W. Dijkstra", likes: 15 },
+      ];
+
+      const result = helper.mostLikes(blogs);
+      assert.deepStrictEqual(result, {
+        author: "Edsger W. Dijkstra",
+        likes: 27,
+      });
+    }
+  );
+});
 after(async () => {
   await mongoose.connection.close();
 });
-
-// Token user ID: 66e056cba7e1553854f40a6c
-// Blog user ID: 66e05Ø4c1ae716c7f9537Øca

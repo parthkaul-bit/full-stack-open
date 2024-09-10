@@ -1,6 +1,7 @@
 const Blog = require("../models/blog");
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
+const _ = require("lodash");
 
 const initialBlogs = [
   {
@@ -49,8 +50,48 @@ const getTestUser = async () => {
   return user;
 };
 
+const mostBlogs = (blogs) => {
+  if (blogs.length === 0) return null;
+
+  const blogCounts = _.countBy(blogs, "author");
+  const topAuthor = _.maxBy(
+    Object.keys(blogCounts),
+    (author) => blogCounts[author]
+  );
+
+  return {
+    author: topAuthor,
+    blogs: blogCounts[topAuthor],
+  };
+};
+
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) return null;
+
+  const likesByAuthor = _.reduce(
+    blogs,
+    (result, blog) => {
+      result[blog.author] = (result[blog.author] || 0) + blog.likes;
+      return result;
+    },
+    {}
+  );
+
+  const topAuthor = _.maxBy(
+    Object.keys(likesByAuthor),
+    (author) => likesByAuthor[author]
+  );
+
+  return {
+    author: topAuthor,
+    likes: likesByAuthor[topAuthor],
+  };
+};
+
 module.exports = {
   initialBlogs,
   blogsInDb,
   getTestUser,
+  mostBlogs,
+  mostLikes,
 };

@@ -7,7 +7,7 @@ const config = require("./utils/config");
 const logger = require("./utils/logger");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
-const { tokenExtractor } = require("./utils/tokenExtractor");
+const middleware = require("./utils/middleware");
 
 logger.info("connecting to", config.MONGODB_URI);
 
@@ -22,7 +22,7 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
-app.use(tokenExtractor);
+app.use(middleware.tokenExtractor);
 
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", usersRouter);

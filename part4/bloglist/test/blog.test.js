@@ -3,12 +3,13 @@ const assert = require("node:assert");
 const listHelper = require("../utils/list_helper");
 const supertest = require("supertest");
 const app = require("../app");
-const { response } = require("express");
 const Blog = require("../models/blog");
 const api = supertest(app);
 const helper = require("./test_helper");
 const blog = require("../models/blog");
 const mongoose = require("mongoose");
+const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
@@ -214,13 +215,26 @@ test("blog posts has property named id instead of _id", async () => {
 });
 
 test("POST request to the successfully creates a new blog post in db", async () => {
+  const testUser = await User.findOne({ username: "root" });
+
+  // Generate the JWT token using the same secret as your middleware
+  const token = jwt.sign(
+    { username: testUser.username, id: testUser._id },
+    process.env.JWT_SECRET, // Ensure this is the same secret as used in your app
+    { expiresIn: "1h" }
+  );
+
   const newBlog = {
     title: "newTitle",
     author: "newAuthor",
     url: "newURL",
     likes: 10,
   };
-  await api.post("/api/blogs").send(newBlog).expect(201);
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .set({ Authorization: `Bearer ${token}` })
+    .expect(201);
 
   const blogsAtEnd = await helper.blogsInDb();
 
@@ -228,13 +242,25 @@ test("POST request to the successfully creates a new blog post in db", async () 
 });
 
 test("if likes are not provided, its defaulted to 0", async () => {
+  const testUser = await User.findOne({ username: "root" });
+
+  const token = jwt.sign(
+    { username: testUser.username, id: testUser._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+
   const newBlog = {
     title: "newTitle",
     author: "newAuthor",
     url: "newURL",
   };
 
-  const response = await api.post("/api/blogs").send(newBlog).expect(201);
+  const response = await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .set({ Authorization: `Bearer ${token}` })
+    .expect(201);
 
   assert.strictEqual(response.body.likes, 0);
   assert.strictEqual(response.body.title, newBlog.title);
@@ -243,23 +269,51 @@ test("if likes are not provided, its defaulted to 0", async () => {
 });
 
 test("backend responds with bad request when title or url properties are missing", async () => {
+  const testUser = await User.findOne({ username: "root" });
+
+  const token = jwt.sign(
+    { username: testUser.username, id: testUser._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+
   const newBlog = {
     author: "newAuthor",
     likes: 10,
   };
-  await api.post("/api/blogs").send(newBlog).expect(400);
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .set({ Authorization: `Bearer ${token}` })
+    .expect(400);
 });
 
 test("deleting a blog", async () => {
-  const blogsAtStart = await helper.blogsInDb();
-  const blogToDelete = blogsAtStart[0];
+  const testUser = await helper.getTestUser();
 
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+  const token = jwt.sign(
+    { username: testUser.username, id: testUser._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+  const newBlog = new Blog({
+    title: "Test blog to delete",
+    author: "Test Author",
+    url: "http://testurl.com",
+    likes: 0,
+    user: testUser.id,
+  });
+  await newBlog.save();
 
-  const blogsAtEnd = await helper.blogsInDb();
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
+  console.log("Test user ID:", testUser.id);
+  console.log("Blog to delete user ID:", newBlog.user.toString());
 
-  const deletedBlog = await Blog.findById(blogToDelete.id);
+  await api
+    .delete(`/api/blogs/${newBlog.id}`)
+    .set({ Authorization: `Bearer ${token}` })
+    .expect(204);
+
+  const deletedBlog = await Blog.findById(newBlog.id);
   assert.strictEqual(deletedBlog, null);
 });
 
@@ -309,3 +363,6 @@ test("PUT request updates a blog post successfully", async () => {
 after(async () => {
   await mongoose.connection.close();
 });
+
+// Token user ID: 66e056cba7e1553854f40a6c
+// Blog user ID: 66e05Ø4c1ae716c7f9537Øca

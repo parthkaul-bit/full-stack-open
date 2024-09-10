@@ -10,7 +10,11 @@ const bcrypt = require("bcryptjs");
 beforeEach(async () => {
   await User.deleteMany({});
   const passwordHash = await bcrypt.hash("sekret", 10);
-  const user = new User({ username: "root", passwordHash });
+  const user = new User({
+    username: "root",
+    passwordHash,
+    blogs: "5a422a851b54a676234d17f7",
+  });
   await user.save();
 });
 
@@ -18,7 +22,6 @@ describe("invalid user creation", () => {
   test("should return 400 if username or password is missing", async () => {
     const newUser = {
       username: "testuser",
-      // Missing password
     };
 
     const response = await api.post("/api/users").send(newUser).expect(400);
@@ -30,8 +33,8 @@ describe("invalid user creation", () => {
 
   test("should return 400 if username or password is less than 4 characters", async () => {
     const newUser = {
-      username: "us", // Invalid username (less than 3 characters)
-      password: "pw", // Invalid password (less than 3 characters)
+      username: "us",
+      password: "pw",
     };
 
     const response = await api.post("/api/users").send(newUser).expect(400);

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import blogs from "../services/blogs";
 import Alert from "./Alert";
 
-const Create = ({ user }) => {
+const Create = ({ user, toggleVisibility }) => {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [author, setAuthor] = useState("");
@@ -24,6 +24,7 @@ const Create = ({ user }) => {
     setAuthor("");
     setTitle("");
     setUrl("");
+    toggleVisibility();
   };
 
   return (

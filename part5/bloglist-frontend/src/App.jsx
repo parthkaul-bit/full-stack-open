@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import LoginForm from "./components/LoginForm";
 import Create from "./components/Create";
-import Alert from "./components/Alert";
+import Togglable from "./components/Toggable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -28,7 +29,14 @@ const App = () => {
         <button onClick={handleLogout}>Logout</button>
       </div>
       <br />
-      <Create user={user} />
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <Create
+          user={user}
+          toggleVisibility={() => {
+            blogFormRef.current.toggleVisibility();
+          }}
+        />
+      </Togglable>
       <br />
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />

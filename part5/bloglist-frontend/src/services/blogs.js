@@ -13,4 +13,22 @@ const postOne = (blogData, token) => {
   return request.then((response) => response.data);
 };
 
-export default { getAll, postOne };
+const updateOne = (updatedBlogData, token) => {
+  const request = axios.put(
+    `${baseUrl}/${updatedBlogData.id}`,
+    updatedBlogData,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return request.then((response) => response.data);
+};
+
+const deleteOne = (blogId, token) => {
+  const request = axios.delete(`${baseUrl}/${blogId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return request.then((response) => response.data);
+};
+
+export default { getAll, postOne, updateOne, deleteOne };

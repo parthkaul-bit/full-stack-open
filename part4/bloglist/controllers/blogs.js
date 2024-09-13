@@ -88,9 +88,11 @@ blogsRouter.delete(
   }
 );
 
-blogsRouter.put("/:id", async (request, response) => {
+blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
   const matchingId = request.params.id;
   const { title, author, url, likes } = request.body;
+  const user = request.user.id;
+
   if (!title || !author || !url || !likes) {
     return response.status(400).json({ error: "Missing Fields" });
   }
@@ -99,6 +101,7 @@ blogsRouter.put("/:id", async (request, response) => {
     author,
     url,
     likes,
+    user,
   });
 
   const matchingBlog = await Blog.findById(matchingId);
@@ -108,7 +111,7 @@ blogsRouter.put("/:id", async (request, response) => {
   } else {
     const updatedBlog = await Blog.findByIdAndUpdate(
       matchingId,
-      { title, author, url, likes },
+      { title, author, url, likes, user },
       {
         new: true,
         runValidators: true,

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 import blogs from "../services/blogs";
-import { PropTypes } from "prop-types";
 
 const Blog = ({ blog, user, fetchBlogs }) => {
   const [visible, setVisible] = useState(false);
@@ -23,29 +23,30 @@ const Blog = ({ blog, user, fetchBlogs }) => {
 
   const handleDelete = async (event) => {
     event.preventDefault();
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       await blogs.deleteOne(blog.id, user.token);
-    await fetchBlogs();
+      await fetchBlogs();
+    }
   };
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className="blog">
       <div>
-        {blog.title}
+        {blog.title} {blog.author}
         <button onClick={() => setVisible(!visible)}>
           {visible ? "hide" : "view"}
         </button>
       </div>
-      <div style={showWhenVisible}>
-        <div>{blog.url}</div>
-        <div>
+      <div style={showWhenVisible} className="togglableContent">
+        <div className="url">URL: {blog.url}</div>
+        <div className="likes">
           Likes: {blog.likes} <button onClick={handleLike}>like</button>
         </div>
         <div>
-          {blog.author}
-          {blog.user[0].id === user.id ? (
+          {blog.user && blog.user[0] && blog.user[0].name}
+          {blog.user && blog.user[0] && blog.user[0].id === user.id && (
             <button onClick={handleDelete}>delete</button>
-          ) : null}
+          )}
         </div>
       </div>
     </div>

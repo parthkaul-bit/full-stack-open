@@ -39,6 +39,7 @@ const Create = ({ user, toggleVisibility }) => {
             type="text"
             value={title}
             name="title"
+            placeholder="Title"
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
@@ -48,6 +49,7 @@ const Create = ({ user, toggleVisibility }) => {
             type="text"
             value={author}
             name="author"
+            placeholder="Author"
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
@@ -57,6 +59,7 @@ const Create = ({ user, toggleVisibility }) => {
             type="text"
             value={url}
             name="url"
+            placeholder="URL"
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>

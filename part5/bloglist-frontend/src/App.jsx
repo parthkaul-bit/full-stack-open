@@ -4,10 +4,12 @@ import blogService from "./services/blogs";
 import LoginForm from "./components/LoginForm";
 import Create from "./components/Create";
 import Togglable from "./components/Toggable";
+import Alert from "./components/Alert";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
+  const [message, setMessage] = useState("");
   const blogFormRef = useRef();
 
   const fetchBlogs = async () => {
@@ -34,12 +36,16 @@ const App = () => {
         <button onClick={handleLogout}>Logout</button>
       </div>
       <br />
+      <Alert message={message} type="success" />
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <Create
           user={user}
           toggleVisibility={() => {
             blogFormRef.current.toggleVisibility();
           }}
+          fetchBlogs={fetchBlogs}
+          message={message}
+          setMessage={setMessage}
         />
       </Togglable>
       <br />

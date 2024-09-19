@@ -32,10 +32,16 @@ const Blog = ({ blog, user, fetchBlogs }) => {
   return (
     <div style={blogStyle} className="blog">
       <div>
-        {blog.title} {blog.author}
-        <button onClick={() => setVisible(!visible)}>
-          {visible ? "hide" : "view"}
-        </button>
+        <div>
+          Title:
+          {blog.title}
+        </div>
+        Author: {blog.author}
+        <div>
+          <button onClick={() => setVisible(!visible)}>
+            {visible ? "hide" : "view"}
+          </button>
+        </div>
       </div>
       <div style={showWhenVisible} className="togglableContent">
         <div className="url">URL: {blog.url}</div>

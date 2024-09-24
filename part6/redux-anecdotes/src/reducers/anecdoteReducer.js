@@ -31,17 +31,32 @@ const reducer = (state = initialState, action) => {
         ...anecdoteToVote,
         votes: anecdoteToVote.votes + 1,
       };
-      return state.map((anecdote) =>
-        anecdote.id !== id ? anecdote : updatedAnecdote
-      );
+      return state
+        .map((anecdote) => (anecdote.id !== id ? anecdote : updatedAnecdote))
+        .sort((a, b) => b.votes - a.votes);
+    case "ADD_NEW":
+      const content = action.payload.content;
+      const newAnecdote = {
+        id: getId(),
+        votes: 0,
+        content,
+      };
+      return [...state, newAnecdote].sort((a, b) => b.votes - a.votes);
   }
-  return state;
+  return state.sort((a, b) => b.votes - a.votes);
 };
 
 export const increaseVote = (id) => {
   return {
     type: "VOTE",
     payload: { id },
+  };
+};
+
+export const addNewNote = (content) => {
+  return {
+    type: "ADD_NEW",
+    payload: { content },
   };
 };
 export default reducer;

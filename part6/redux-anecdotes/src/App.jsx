@@ -1,12 +1,12 @@
-import { useDispatch } from "react-redux";
-import { addNewNote } from "./reducers/anecdoteReducer";
 import AnecdoteList from "./components/AnecdoteList";
 import AnecdoteForm from "./components/AnecdoteForm";
+import Filter from "./components/Filter";
 
 const App = () => {
   return (
-    // anecdote list
     <>
+      <h2>Anecdotes</h2>
+      <Filter />
       <AnecdoteList />
       <AnecdoteForm />
     </>

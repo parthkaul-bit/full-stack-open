@@ -3,9 +3,10 @@ import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import App from "./App";
 import filterReducer from "./reducers/filterReducer";
-import anecdoteReducer from "./reducers/anecdoteReducer";
+import anecdoteReducer, { setAnecdotes } from "./reducers/anecdoteReducer";
 import notificationReducer from "./reducers/notificationReducer";
 import { configureStore } from "@reduxjs/toolkit";
+import anecdoteService from "./services/anecdoteService";
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,10 @@ const store = configureStore({
     filter: filterReducer,
     notification: notificationReducer,
   },
+});
+
+anecdoteService.getAll().then((anecdotes) => {
+  store.dispatch(setAnecdotes(anecdotes));
 });
 
 // const reducer = combineReducers({

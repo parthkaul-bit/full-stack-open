@@ -1,11 +1,20 @@
 import AnecdoteForm from "./components/AnecdoteForm";
 import Notification from "./components/Notification";
-import { useQuery } from "@tanstack/react-query";
-import { getAll } from "./requests";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getAll, updateVotes } from "./requests";
 
 const App = () => {
+  const queryClient = useQueryClient();
+
+  const newAnecdoteMutation = useMutation({
+    mutationFn: updateVotes,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["anecdotes"] });
+    },
+  });
+
   const handleVote = (anecdote) => {
-    console.log("vote");
+    newAnecdoteMutation.mutate(anecdote);
   };
 
   const result = useQuery({

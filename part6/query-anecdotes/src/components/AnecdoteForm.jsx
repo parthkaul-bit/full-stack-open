@@ -1,13 +1,26 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postOne } from "../requests";
+import { useNotification } from "../NotificationContext";
 
 const AnecdoteForm = () => {
   const queryClient = useQueryClient();
+  const [message, dispatch] = useNotification();
 
   const newAnecdoteMutation = useMutation({
     mutationFn: postOne,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["anecdotes"] });
+    },
+    onError: (error) => {
+      dispatch({
+        type: "SET_NOTIFICATION",
+        payload: `Error: ${
+          error.response?.data?.error || "Failed to update anecdote."
+        }`,
+      });
+      setTimeout(() => {
+        dispatch({ type: "CLEAR_NOTIFICATION" });
+      }, 5000);
     },
   });
   const onCreate = (event) => {

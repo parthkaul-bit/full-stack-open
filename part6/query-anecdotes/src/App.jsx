@@ -35,6 +35,10 @@ const App = () => {
   if (result.isLoading) {
     return <div>Loading anecdotes...</div>;
   }
+
+  if (result.isError) {
+    console.log("errror", result.isError);
+  }
   const anecdotes = result.data;
   console.log(anecdotes);
 

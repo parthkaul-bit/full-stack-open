@@ -89,7 +89,13 @@ const CreateNew = (props) => {
     setTimeout(() => {
       props.setNotification("");
     }, 3000);
-    console.log(props);
+  };
+
+  const handleReset = (e) => {
+    e.preventDefault();
+    props.content.resetInputs();
+    props.author.resetInputs();
+    props.info.resetInputs();
   };
 
   return (
@@ -109,6 +115,7 @@ const CreateNew = (props) => {
           <input {...props.info} name="info" />
         </div>
         <button>create</button>
+        <button onClick={handleReset}>reset</button>
       </form>
     </div>
   );

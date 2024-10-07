@@ -1,30 +1,29 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import blogs from "../services/blogs";
-import Alert from "./Alert";
+import { setNotification, clearNotification } from "../redux/notificationSlice";
 
-const Create = ({
-  user,
-  toggleVisibility,
-  fetchBlogs,
-  message,
-  setMessage,
-}) => {
+const Create = ({ user, toggleVisibility, fetchBlogs }) => {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [author, setAuthor] = useState("");
-  // const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
 
   const handleCreate = async (event) => {
     event.preventDefault();
-
     const returnedValue = await blogs.postOne(
       { title, author, url },
       user.token
     );
     if (returnedValue) {
-      setMessage(`a new blog ${title} by ${author} added`);
+      dispatch(
+        setNotification({
+          message: `a new blog ${title} by ${author} added`,
+          type: "success",
+        })
+      );
       setTimeout(() => {
-        setMessage(null);
+        dispatch(clearNotification());
       }, 2000);
     }
     setAuthor("");

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import loginService from "../services/loginService";
+import { setNotification, clearNotification } from "../redux/notificationSlice";
 import Alert from "./Alert";
 
 const LoginForm = ({ user, setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
+  const { message, type } = useSelector((state) => state.notification);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
@@ -17,7 +20,6 @@ const LoginForm = ({ user, setUser }) => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
     try {
       const user = await loginService.login({
         username,
@@ -28,9 +30,14 @@ const LoginForm = ({ user, setUser }) => {
       setPassword("");
       window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
     } catch (exception) {
-      setMessage("Wrong username or password");
+      dispatch(
+        setNotification({
+          message: "Wrong username or password",
+          type: "error",
+        })
+      );
       setTimeout(() => {
-        setMessage(null);
+        dispatch(clearNotification());
       }, 2000);
     }
   };

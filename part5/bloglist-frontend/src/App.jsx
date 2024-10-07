@@ -5,12 +5,13 @@ import LoginForm from "./components/LoginForm";
 import Create from "./components/Create";
 import Togglable from "./components/Toggable";
 import Alert from "./components/Alert";
+import { useSelector } from "react-redux";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
-  const [message, setMessage] = useState("");
   const blogFormRef = useRef();
+  const { message, type } = useSelector((state) => state.notification);
 
   const fetchBlogs = async () => {
     const blogs = await blogService.getAll();
@@ -18,7 +19,6 @@ const App = () => {
   };
   useEffect(() => {
     fetchBlogs();
-    // blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
 
   const handleLogout = () => {
@@ -36,7 +36,7 @@ const App = () => {
         <button onClick={handleLogout}>Logout</button>
       </div>
       <br />
-      <Alert message={message} type="success" />
+      <Alert message={message} type={type} />
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <Create
           user={user}
@@ -45,7 +45,6 @@ const App = () => {
           }}
           fetchBlogs={fetchBlogs}
           message={message}
-          setMessage={setMessage}
         />
       </Togglable>
       <br />

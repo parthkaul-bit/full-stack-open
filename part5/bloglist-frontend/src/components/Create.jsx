@@ -30,7 +30,7 @@ const Create = ({ user, toggleVisibility, fetchBlogs }) => {
     setTitle("");
     setUrl("");
     toggleVisibility();
-    fetchBlogs();
+    dispatch(fetchBlogs());
   };
 
   return (

@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import blogs from "../services/blogs";
+import { useDispatch } from "react-redux";
+import { fetchBlogs } from "../redux/blogSlice"; // Import the fetchBlogs action
+import blogs from "../services/blogs"; // Ensure correct import path
 
-const Blog = ({ blog, user, fetchBlogs }) => {
+const Blog = ({ blog, user }) => {
   const [visible, setVisible] = useState(false);
+  const dispatch = useDispatch();
 
   const showWhenVisible = { display: visible ? "" : "none" };
 
@@ -18,24 +21,21 @@ const Blog = ({ blog, user, fetchBlogs }) => {
   const handleLike = async (event) => {
     event.preventDefault();
     await blogs.updateOne({ ...blog, likes: blog.likes + 1 }, user.token);
-    await fetchBlogs();
+    dispatch(fetchBlogs());
   };
 
   const handleDelete = async (event) => {
     event.preventDefault();
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       await blogs.deleteOne(blog.id, user.token);
-      await fetchBlogs();
+      dispatch(fetchBlogs());
     }
   };
 
   return (
     <div style={blogStyle} className="blog">
       <div>
-        <div>
-          Title:
-          {blog.title}
-        </div>
+        <div>Title: {blog.title}</div>
         Author: {blog.author}
         <div>
           <button onClick={() => setVisible(!visible)}>
@@ -62,7 +62,6 @@ const Blog = ({ blog, user, fetchBlogs }) => {
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
-  fetchBlogs: PropTypes.func.isRequired,
 };
 
 export default Blog;

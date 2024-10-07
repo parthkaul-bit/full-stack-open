@@ -1,25 +1,28 @@
+// src/App.js
 import { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import Blog from "./components/Blog";
-import blogService from "./services/blogs";
 import LoginForm from "./components/LoginForm";
 import Create from "./components/Create";
 import Togglable from "./components/Toggable";
 import Alert from "./components/Alert";
-import { useSelector } from "react-redux";
+import { fetchBlogs } from "./redux/blogSlice";
+import { useDispatch } from "react-redux";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const blogFormRef = useRef();
+  const dispatch = useDispatch();
   const { message, type } = useSelector((state) => state.notification);
+  const blogs = useSelector((state) => state.blogs);
 
-  const fetchBlogs = async () => {
-    const blogs = await blogService.getAll();
-    setBlogs(blogs);
-  };
   useEffect(() => {
-    fetchBlogs();
-  }, []);
+    dispatch(fetchBlogs());
+  }, [dispatch]);
+
+  useEffect(() => {
+    console.log("Current blogs state:", blogs);
+  }, [blogs]);
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedBlogappUser");
@@ -44,13 +47,14 @@ const App = () => {
             blogFormRef.current.toggleVisibility();
           }}
           fetchBlogs={fetchBlogs}
-          message={message}
         />
       </Togglable>
       <br />
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} user={user} fetchBlogs={fetchBlogs} />
-      ))}
+      {blogs.length === 0 ? (
+        <p>No blogs available</p>
+      ) : (
+        blogs.map((blog) => <Blog key={blog.id} blog={blog} user={user} />)
+      )}
     </div>
   );
 };

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
-import { fetchBlogs } from "../redux/blogSlice"; // Import the fetchBlogs action
-import blogs from "../services/blogs"; // Ensure correct import path
+import { likeBlog, deleteBlog, fetchBlogs } from "../redux/blogSlice";
 
 const Blog = ({ blog, user }) => {
   const [visible, setVisible] = useState(false);
@@ -20,14 +19,14 @@ const Blog = ({ blog, user }) => {
 
   const handleLike = async (event) => {
     event.preventDefault();
-    await blogs.updateOne({ ...blog, likes: blog.likes + 1 }, user.token);
-    dispatch(fetchBlogs());
+    const updatedBlog = { ...blog, likes: blog.likes + 1 };
+    dispatch(likeBlog(updatedBlog));
   };
 
   const handleDelete = async (event) => {
     event.preventDefault();
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      await blogs.deleteOne(blog.id, user.token);
+      dispatch(deleteBlog(blog.id));
       dispatch(fetchBlogs());
     }
   };

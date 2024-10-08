@@ -1,12 +1,31 @@
-// src/redux/blogSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import blogs from "../services/blogs"; // Ensure correct import path
+import blogs from "../services/blogs";
 
-// Create an async thunk for fetching blogs
 export const fetchBlogs = createAsyncThunk("blogs/fetchBlogs", async () => {
   const blogsData = await blogs.getAll();
-  console.log("Fetched blogs:", blogsData); // Log fetched data
   return blogsData;
+});
+
+export const likeBlog = createAsyncThunk("blogs/likeBlog", async (blog) => {
+  const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+  const user = JSON.parse(loggedUserJSON);
+  try {
+    const updatedBlog = await blogs.updateOne(blog, user.token);
+    return updatedBlog;
+  } catch (error) {
+    throw error;
+  }
+});
+
+export const deleteBlog = createAsyncThunk("blogs/deleteBlog", async (id) => {
+  const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+  const user = JSON.parse(loggedUserJSON);
+  try {
+    await blogs.deleteOne(id, user.token);
+    return id;
+  } catch (error) {
+    throw error;
+  }
 });
 
 const blogSlice = createSlice({
@@ -14,9 +33,17 @@ const blogSlice = createSlice({
   initialState: [],
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchBlogs.fulfilled, (state, action) => {
-      return action.payload; // Update state with fetched blogs
-    });
+    builder
+      .addCase(fetchBlogs.fulfilled, (state, action) => {
+        return action.payload;
+      })
+      .addCase(likeBlog.fulfilled, (state, action) => {
+        const updatedBlog = action.payload;
+        const index = state.findIndex((blog) => blog.id === updatedBlog.id);
+        if (index !== -1) {
+          state[index] = updatedBlog;
+        }
+      });
   },
 });
 

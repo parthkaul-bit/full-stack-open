@@ -15,6 +15,7 @@ const Create = ({ user, toggleVisibility, fetchBlogs }) => {
       { title, author, url },
       user.token
     );
+
     if (returnedValue) {
       dispatch(
         setNotification({

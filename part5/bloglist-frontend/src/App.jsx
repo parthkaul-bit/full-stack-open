@@ -8,13 +8,14 @@ import Togglable from "./components/Toggable";
 import Alert from "./components/Alert";
 import { fetchBlogs } from "./redux/blogSlice";
 import { useDispatch } from "react-redux";
+import { setUser } from "./redux/userSlice";
 
 const App = () => {
-  const [user, setUser] = useState(null);
   const blogFormRef = useRef();
   const dispatch = useDispatch();
   const { message, type } = useSelector((state) => state.notification);
   const blogs = useSelector((state) => state.blogs);
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(fetchBlogs());
@@ -26,11 +27,11 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedBlogappUser");
-    setUser(null);
+    dispatch(setUser(null));
   };
 
   return user === null ? (
-    <LoginForm user={user} setUser={setUser} />
+    <LoginForm />
   ) : (
     <div>
       <h2>blogs</h2>

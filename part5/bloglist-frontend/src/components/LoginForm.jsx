@@ -2,21 +2,30 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import loginService from "../services/loginService";
 import { setNotification, clearNotification } from "../redux/notificationSlice";
+import { setUser } from "../redux/userSlice"; // Import the setUser action
 import Alert from "./Alert";
 
-const LoginForm = ({ user, setUser }) => {
+const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
+
   const { message, type } = useSelector((state) => state.notification);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      try {
+        const user = JSON.parse(loggedUserJSON);
+        dispatch(setUser(user)); // Dispatch to set the user in Redux store
+      } catch (error) {
+        console.error(
+          "Error parsing loggedBlogappUser from localStorage",
+          error
+        );
+      }
     }
-  }, []);
+  }, [dispatch]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -25,10 +34,9 @@ const LoginForm = ({ user, setUser }) => {
         username,
         password,
       });
-      setUser(user);
-      setUsername("");
-      setPassword("");
-      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
+      dispatch(setUser(user)); // Set the user in the Redux store
+      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user)); // Save user in localStorage
+      // navigate("/blogs"); // You should navigate using useNavigate from react-router-dom
     } catch (exception) {
       dispatch(
         setNotification({
@@ -45,7 +53,8 @@ const LoginForm = ({ user, setUser }) => {
   return (
     <>
       <h2>log in to application</h2>
-      <Alert message={message} type="error" />
+      {message && <Alert message={message} type={type} />}{" "}
+      {/* Show notification */}
       <form onSubmit={handleLogin}>
         <div>
           username

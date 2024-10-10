@@ -9,6 +9,8 @@ import Alert from "./components/Alert";
 import { fetchBlogs } from "./redux/blogSlice";
 import { useDispatch } from "react-redux";
 import { setUser } from "./redux/userSlice";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Users from "./components/Users";
 
 const App = () => {
   const blogFormRef = useRef();
@@ -33,30 +35,35 @@ const App = () => {
   return user === null ? (
     <LoginForm />
   ) : (
-    <div>
-      <h2>blogs</h2>
+    <BrowserRouter>
       <div>
-        <div>{user.username} logged in </div>
-        <button onClick={handleLogout}>Logout</button>
+        <h2>blogs</h2>
+        <div>
+          <div>{user.username} logged in </div>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
+        <br />
+        <Alert message={message} type={type} />
+        <Togglable buttonLabel="new blog" ref={blogFormRef}>
+          <Create
+            user={user}
+            toggleVisibility={() => {
+              blogFormRef.current.toggleVisibility();
+            }}
+            fetchBlogs={fetchBlogs}
+          />
+        </Togglable>
+        <br />
+        {blogs.length === 0 ? (
+          <p>No blogs available</p>
+        ) : (
+          blogs.map((blog) => <Blog key={blog.id} blog={blog} user={user} />)
+        )}
       </div>
-      <br />
-      <Alert message={message} type={type} />
-      <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <Create
-          user={user}
-          toggleVisibility={() => {
-            blogFormRef.current.toggleVisibility();
-          }}
-          fetchBlogs={fetchBlogs}
-        />
-      </Togglable>
-      <br />
-      {blogs.length === 0 ? (
-        <p>No blogs available</p>
-      ) : (
-        blogs.map((blog) => <Blog key={blog.id} blog={blog} user={user} />)
-      )}
-    </div>
+      <Routes>
+        <Route path="/users" element={<Users />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 

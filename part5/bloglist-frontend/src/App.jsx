@@ -1,4 +1,3 @@
-// src/App.js
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import Blog from "./components/Blog";
@@ -11,6 +10,9 @@ import { useDispatch } from "react-redux";
 import { setUser } from "./redux/userSlice";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Users from "./components/Users";
+import UserBlogs from "./components/UserDetail";
+import UserDetail from "./components/UserDetail";
+import BlogDetail from "./components/BlogDetail";
 
 const App = () => {
   const blogFormRef = useRef();
@@ -36,32 +38,41 @@ const App = () => {
     <LoginForm />
   ) : (
     <BrowserRouter>
-      <div>
-        <h2>blogs</h2>
-        <div>
-          <div>{user.username} logged in </div>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-        <br />
-        <Alert message={message} type={type} />
-        <Togglable buttonLabel="new blog" ref={blogFormRef}>
-          <Create
-            user={user}
-            toggleVisibility={() => {
-              blogFormRef.current.toggleVisibility();
-            }}
-            fetchBlogs={fetchBlogs}
-          />
-        </Togglable>
-        <br />
-        {blogs.length === 0 ? (
-          <p>No blogs available</p>
-        ) : (
-          blogs.map((blog) => <Blog key={blog.id} blog={blog} user={user} />)
-        )}
-      </div>
       <Routes>
+        <Route
+          path="/"
+          element={
+            <div>
+              <h2>blogs</h2>
+              <div>
+                <div>{user.username} logged in</div>
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+              <br />
+              <Alert message={message} type={type} />
+              <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                <Create
+                  user={user}
+                  toggleVisibility={() => {
+                    blogFormRef.current.toggleVisibility();
+                  }}
+                  fetchBlogs={fetchBlogs}
+                />
+              </Togglable>
+              <br />
+              {blogs.length === 0 ? (
+                <p>No blogs available</p>
+              ) : (
+                blogs.map((blog) => (
+                  <Blog key={blog.id} blog={blog} user={user} />
+                ))
+              )}
+            </div>
+          }
+        />
+        <Route path="/users/:id" element={<UserDetail />} />
         <Route path="/users" element={<Users />} />
+        <Route path="/blogs/:id" element={<BlogDetail />} />
       </Routes>
     </BrowserRouter>
   );

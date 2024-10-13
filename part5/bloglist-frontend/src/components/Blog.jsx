@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { likeBlog, deleteBlog, fetchBlogs } from "../redux/blogSlice";
+import { Link } from "react-router-dom";
 
 const Blog = ({ blog, user }) => {
-  const [visible, setVisible] = useState(false);
+  // const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
 
-  const showWhenVisible = { display: visible ? "" : "none" };
+  // const showWhenVisible = { display: visible ? "" : "none" };
 
   const blogStyle = {
     paddingTop: 10,
@@ -34,15 +35,17 @@ const Blog = ({ blog, user }) => {
   return (
     <div style={blogStyle} className="blog">
       <div>
-        <div>Title: {blog.title}</div>
-        Author: {blog.author}
-        <div>
-          <button onClick={() => setVisible(!visible)}>
+        <Link to={`/blogs/${blog.id}`}>
+          <h3>{blog.title}</h3>
+        </Link>{" "}
+        {/* Author: {blog.author} */}
+        {/* <div>
+           <button onClick={() => setVisible(!visible)}>
             {visible ? "hide" : "view"}
           </button>
-        </div>
+        </div> */}
       </div>
-      <div style={showWhenVisible} className="togglableContent">
+      {/* <div style={showWhenVisible} className="togglableContent">
         <div className="url">URL: {blog.url}</div>
         <div className="likes">
           Likes: {blog.likes} <button onClick={handleLike}>like</button>
@@ -53,7 +56,7 @@ const Blog = ({ blog, user }) => {
             <button onClick={handleDelete}>delete</button>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

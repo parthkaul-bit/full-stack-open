@@ -121,4 +121,28 @@ blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
   }
 });
 
+blogsRouter.post("/:id/comments", async (request, response) => {
+  const blogId = request.params.id;
+  const { comment } = request.body;
+
+  if (!comment) {
+    return response.status(400).json({ error: "Comment content is required" });
+  }
+
+  try {
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      return response.status(404).json({ error: "Blog not found" });
+    }
+
+    blog.comments = blog.comments.concat(comment);
+    const updatedBlog = await blog.save();
+
+    response.status(201).json(updatedBlog);
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    response.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = blogsRouter;

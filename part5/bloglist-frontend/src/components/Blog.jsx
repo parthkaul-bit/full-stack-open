@@ -1,28 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { likeBlog, deleteBlog, fetchBlogs } from "../redux/blogSlice";
 import { Link } from "react-router-dom";
+import { Card, Button } from "react-bootstrap"; // Importing React Bootstrap components
 
 const Blog = ({ blog, user }) => {
-  // const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
-
-  // const showWhenVisible = { display: visible ? "" : "none" };
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  const handleLike = async (event) => {
-    event.preventDefault();
-    const updatedBlog = { ...blog, likes: blog.likes + 1 };
-    dispatch(likeBlog(updatedBlog));
-  };
 
   const handleDelete = async (event) => {
     event.preventDefault();
@@ -33,31 +17,29 @@ const Blog = ({ blog, user }) => {
   };
 
   return (
-    <div style={blogStyle} className="blog">
-      <div>
-        <Link to={`/blogs/${blog.id}`}>
-          <h3>{blog.title}</h3>
-        </Link>{" "}
-        {/* Author: {blog.author} */}
-        {/* <div>
-           <button onClick={() => setVisible(!visible)}>
-            {visible ? "hide" : "view"}
-          </button>
-        </div> */}
-      </div>
-      {/* <div style={showWhenVisible} className="togglableContent">
-        <div className="url">URL: {blog.url}</div>
-        <div className="likes">
-          Likes: {blog.likes} <button onClick={handleLike}>like</button>
-        </div>
-        <div>
-          {blog.user && blog.user[0] && blog.user[0].name}
-          {blog.user && blog.user[0] && blog.user[0].id === user.id && (
-            <button onClick={handleDelete}>delete</button>
-          )}
-        </div>
-      </div> */}
-    </div>
+    <Card className="my-3" border="light">
+      <Card.Body>
+        <Card.Title>
+          <Link
+            to={`/blogs/${blog.id}`}
+            style={{ textDecoration: "none", color: "#007bff" }}
+          >
+            {blog.title}
+          </Link>
+        </Card.Title>
+        <Card.Text>Author: {blog.author}</Card.Text>
+        <Card.Text>
+          Likes: {blog.likes}
+          {/* Uncomment the following line to enable like functionality */}
+          {/* <Button variant="outline-primary" onClick={handleLike}>Like</Button> */}
+        </Card.Text>
+        {blog.user && blog.user[0] && blog.user[0].id === user.id && (
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        )}
+      </Card.Body>
+    </Card>
   );
 };
 

@@ -28,6 +28,14 @@ export const deleteBlog = createAsyncThunk("blogs/deleteBlog", async (id) => {
   }
 });
 
+export const addComment = createAsyncThunk(
+  "blogs/addComment",
+  async ({ id, comment }) => {
+    const updatedBlog = await blogs.addComment(id, comment);
+    return updatedBlog;
+  }
+);
+
 const blogSlice = createSlice({
   name: "blogs",
   initialState: [],
@@ -38,6 +46,19 @@ const blogSlice = createSlice({
         return action.payload;
       })
       .addCase(likeBlog.fulfilled, (state, action) => {
+        const updatedBlog = action.payload;
+        const index = state.findIndex((blog) => blog.id === updatedBlog.id);
+        if (index !== -1) {
+          state[index] = updatedBlog;
+        }
+      })
+      .addCase(deleteBlog.fulfilled, (state, action) => {
+        const id = action.payload;
+        return state.filter((blog) => blog.id !== id); // Return the state without the deleted blog
+      })
+
+      // Handle adding a comment to a blog
+      .addCase(addComment.fulfilled, (state, action) => {
         const updatedBlog = action.payload;
         const index = state.findIndex((blog) => blog.id === updatedBlog.id);
         if (index !== -1) {

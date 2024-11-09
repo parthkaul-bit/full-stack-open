@@ -111,13 +111,14 @@ type Author {
     name: String!
     id: ID!
     born: Int
+    bookCount: Int!
 }
 
 type Query {    
     bookCount: Int!
     authorCount: Int!
     allBooks(author: String, genre : String): [Book!]!
-    allAuthors: [Author!]!  
+    allAuthors: [Author!]!
   }
 
 type Mutation{
@@ -147,6 +148,10 @@ const resolvers = {
       return books;
     },
     allAuthors: () => authors,
+  },
+  Author: {
+    bookCount: (parent) =>
+      books.filter((book) => book.author === parent.name).length,
   },
   Mutation: {
     addBook: (root, args) => {
